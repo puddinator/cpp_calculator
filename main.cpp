@@ -1,23 +1,19 @@
 #include <iostream>
+#include <string>
 #include "Calculator.h"
 
-using namespace std;
-
 int main() {
-	double x = 0.0;
-	double y = 0.0;
 	double result = 0.0;
-	char oper = '+';
+	std::string infix;
 
-	cout << "Calculator Console Application" << endl << endl;
-	cout << "Please enter the operation to perform. Format: a+b | a-b | a*b | a/b"
-		 << endl;
+	std::cout << "Calculator Console Application\n\n";
+	std::cout << "Please enter your operation. You can use the +, -, *, /, ^, (, ) operators. Leave no spaces.\n";
 
-	Calculator c;
+	Calculator& calculator = Calculator::getInstance();
 	while (true) {
-		cin >> x >> oper >> y;
-		result = c.Calculate(x, oper, y);
-		cout << "Result " << "of " << x << oper << y << " is: " << result << endl;
+		std::cin >> infix;
+		result = calculator.calculate(infix);
+		std::cout << "Result " << "of " << infix << " is: " << result << "\n";
 	}
 
 	return 0;
