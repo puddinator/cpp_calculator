@@ -1,6 +1,7 @@
 #include <string>
 #include <stack>
 #include <iostream>
+#include <stdexcept>
 #include "Calculator.h"
 
 const std::unordered_map<char, int> Calculator::inStackPrecedence = {{'+', 2}, {'-', 2}, {'*', 4}, {'/', 4}, {'^', 5}, {'(', 0} };
@@ -16,16 +17,24 @@ double Calculator::calculate(std::string infix) {
 	return Calculator::evaluatePostfix(postfix);
 }
 
+bool isOperand(char c) {
+	if (0 <= c - '0' && c - '0' <= 9)
+		return true;
+	return false;
+}
+
 std::string Calculator::convertToPostfix(std::string infix) {
 	std::stack<char> stack;
 	std::string postfix(infix.size(), 0);
-	int i = 0, j = 0;
-	while (infix[i] != '\0') {
-		if (!inStackPrecedence.contains(infix[i])) {
-			postfix[j++] = infix[i++];
+	int j = 0;
+	for (int i = 0; i < infix.size(); i++) {
+		if (isOperand(infix[i])) {
+			postfix[j++] = infix[i];
+		} else if (!outStackPrecedence.contains(infix[i])) {
+			throw std::invalid_argument("Calculator unable to handle `" + std::string(1, infix[i]) + "` character.");
 		} else if (stack.empty() || outStackPrecedence.at(infix[i]) > inStackPrecedence.at(stack.top())) {
-			stack.push(infix[i++]);
-		} else if (outStackPrecedence.at(infix[i]) == inStackPrecedence.at(stack.top())) {
+			stack.push(infix[i]);
+		} else if (outStackPrecedence.at(infix[i]) == inStackPrecedence.at(stack.top())) { // handle brackets
 			stack.pop();
 		} else {
 			postfix[j++] = stack.top();
@@ -63,6 +72,9 @@ double Calculator::evaluatePostfix(std::string postfix) {
 				break;
 			case '/':
 				res = x / y;
+				break;
+			case '^':
+				res = pow(x, y);
 				break;
 			}
 			stack.push(res);

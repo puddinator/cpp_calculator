@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <stdexcept>
 #include "Calculator.h"
 
 int main() {
@@ -12,8 +13,12 @@ int main() {
 	Calculator& calculator = Calculator::getInstance();
 	while (true) {
 		std::cin >> infix;
-		result = calculator.calculate(infix);
-		std::cout << "Result " << "of " << infix << " is: " << result << "\n";
+		try {
+			result = calculator.calculate(infix);
+			std::cout << "Result " << "of " << infix << " is: " << result << "\n";
+		} catch (std::invalid_argument& e) {
+			std::cerr << e.what() << "\n";
+		}
 	}
 
 	return 0;
