@@ -26,16 +26,17 @@ bool isOperand(char c) {
 std::string Calculator::convertToPostfix(std::string infix) {
 	std::stack<char> stack;
 	std::string postfix(infix.size(), 0);
-	int j = 0;
-	for (int i = 0; i < infix.size(); i++) {
+	int i = 0, j = 0;
+	while (i < infix.size()) {
 		if (isOperand(infix[i])) {
-			postfix[j++] = infix[i];
+			postfix[j++] = infix[i++];
 		} else if (!outStackPrecedence.contains(infix[i])) {
 			throw std::invalid_argument("Calculator unable to handle `" + std::string(1, infix[i]) + "` character.");
 		} else if (stack.empty() || outStackPrecedence.at(infix[i]) > inStackPrecedence.at(stack.top())) {
-			stack.push(infix[i]);
+			stack.push(infix[i++]);
 		} else if (outStackPrecedence.at(infix[i]) == inStackPrecedence.at(stack.top())) { // handle brackets
 			stack.pop();
+			i++;
 		} else {
 			postfix[j++] = stack.top();
 			stack.pop();
@@ -80,5 +81,5 @@ double Calculator::evaluatePostfix(std::string postfix) {
 			stack.push(res);
 		}
 	}
-	return stack.top();
+	return stack.empty() ? 0 : stack.top();
 }
