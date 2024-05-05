@@ -4,17 +4,17 @@
 #include <stdexcept>
 #include "Calculator.h"
 
-const std::unordered_map<char, int> Calculator::inStackPrecedence = {{'+', 2}, {'-', 2}, {'*', 4}, {'/', 4}, {'^', 5}, {'(', 0} };
-const std::unordered_map<char, int> Calculator::outStackPrecedence = {{'+', 1}, {'-', 1}, {'*', 3}, {'/', 3}, {'^', 6}, {'(', 7}, {')', 0} };
-
 Calculator& Calculator::getInstance() {
 	static Calculator instance;
 	return instance;
 }
 
-double Calculator::calculate(std::string infix) {
-	std::string postfix = Calculator::convertToPostfix(infix);
-	return Calculator::evaluatePostfix(postfix);
+const std::unordered_map<char, int> Calculator::inStackPrecedence = {{'+', 2}, {'-', 2}, {'*', 4}, {'/', 4}, {'^', 5}, {'(', 0} };
+const std::unordered_map<char, int> Calculator::outStackPrecedence = {{'+', 1}, {'-', 1}, {'*', 3}, {'/', 3}, {'^', 6}, {'(', 7}, {')', 0} };
+
+int Calculator::calculate(std::vector<std::string> infixVector) {
+	std::vector<std::string> postfixVector = Calculator::convertToPostfixVector(infixVector);
+	return Calculator::evaluatePostfixVector(postfixVector);
 }
 
 bool isOperand(char c) {
@@ -23,15 +23,15 @@ bool isOperand(char c) {
 	return false;
 }
 
-std::string Calculator::convertToPostfix(std::string infix) {
+std::vector<std::string> Calculator::convertToPostfixVector(std::vector<std::string> infix) {
 	std::stack<char> stack;
 	std::string postfix(infix.size(), 0);
 	int i = 0, j = 0;
 	while (i < infix.size()) {
 		if (isOperand(infix[i])) {
 			postfix[j++] = infix[i++];
-		} else if (!outStackPrecedence.contains(infix[i])) {
-			throw std::invalid_argument("Calculator unable to handle `" + std::string(1, infix[i]) + "` character.");
+		} else if (infix[i] == ' ') {
+			i++;
 		} else if (stack.empty() || outStackPrecedence.at(infix[i]) > inStackPrecedence.at(stack.top())) {
 			stack.push(infix[i++]);
 		} else if (outStackPrecedence.at(infix[i]) == inStackPrecedence.at(stack.top())) { // handle brackets
@@ -49,12 +49,12 @@ std::string Calculator::convertToPostfix(std::string infix) {
 	return postfix;
 }
 
-double Calculator::evaluatePostfix(std::string postfix) {
-	std::stack<char> stack;
+int Calculator::evaluatePostfixVector(std::vector<std::string> postfixVector) {
+	std::stack<int> stack;
 
 	int x, y, res;
 	for (int i = 0; postfix[i] != '\0'; i++) {
-		if (!inStackPrecedence.contains(postfix[i])) {
+		if (isOperand(postfix[i])) {
 			stack.push(postfix[i] - '0');
 		} else {
 			y = stack.top();
