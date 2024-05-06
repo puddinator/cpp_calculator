@@ -1,11 +1,9 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
-#include "Parser.h"
 #include "Calculator.h"
 
 int main() {
-	Parser& parser = Parser::getInstance();
 	Calculator& calculator = Calculator::getInstance();
 
 	std::cout << "Calculator Console Application\n\n";
@@ -15,10 +13,8 @@ int main() {
 		double result = 0.0;
 		std::string infix;
 		std::cin >> infix;
-		std::vector<std::string> infixVector;
 		try {
-			infixVector = parser.infixStringToInfixVector(infix);
-			result = calculator.calculate(infixVector);
+			result = calculator.calculate(infix);
 			std::cout << "Result " << "of " << infix << " is: " << result << "\n";
 		} catch (std::invalid_argument& e) {
 			std::cerr << e.what() << "\n";
